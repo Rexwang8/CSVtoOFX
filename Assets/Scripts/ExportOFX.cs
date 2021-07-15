@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 using System.IO;
-using UnityEditor.UI;
 using TMPro;
 
 public class ExportOFX : MonoBehaviour
@@ -22,18 +21,27 @@ public class ExportOFX : MonoBehaviour
     [SerializeField]
     TMP_Text _accText;
 
+    [SerializeField]
+    TMP_Text _inputDisplay;
+    int StockCount = 0;
+    int StockOrderCount = 0;
+
     private void Start()
     {
         //Find current date
         date = System.DateTime.Now.ToString("yyyyMMdd");
     }
 
-    public void ConvertToOFX(Dictionary<int, List<string>> input)
+    public void ConvertToOFX(Dictionary<int, List<string>> input, Dictionary<string, List<string>> stockPrices)
     {
+        //reset counter
+        StockCount = 0;
+        StockOrderCount = 0;
         //Find original path
         OpenFile openScript = _controller.GetComponent<OpenFile>();
         string path = openScript.Path;
-        string[] orPathArr = path.Split('/');
+        print("ORIGINAL PATH:  " + path);
+        string[] orPathArr = path.Split('\\');
         string newPath = "";
 
         //Put new path in same folder as original path
@@ -59,7 +67,7 @@ public class ExportOFX : MonoBehaviour
         {
             File.Delete(newPath);
         }
-
+        print("Output Location: " + newPath);
         #region Write File
         //Write some text to the test.txt file
         StreamWriter writer = new StreamWriter(newPath, true);
@@ -137,8 +145,9 @@ public class ExportOFX : MonoBehaviour
         writer.WriteLine("<INVACCTFROM>");
         writer.WriteLine($"<BROKERID>{_brokerID}</BROKERID>");
         writer.WriteLine($"<ACCTID>{_accID}</ACCTID>");
-        
         writer.WriteLine("</INVACCTFROM>");
+        writer.WriteLine("<INVTRANLIST>");
+
         #endregion
         #region Transactions
 
@@ -152,16 +161,14 @@ public class ExportOFX : MonoBehaviour
             }
             i++;
         }
-        writer.WriteLine($"<DTSTART>{startDate}");
-        writer.WriteLine($"<DTEND>{date}");
-        i = 0;
+        writer.WriteLine($"<DTSTART>{startDate}</DTSTART>");
+        writer.WriteLine($"<DTEND>{date}120000</DTEND>");
         foreach (var value in input.Values)
         {
             if (value[2] != "")
             {
                 #region WRITE STOCK
-                writer.WriteLine("<BUYSTOCK>");
-                writer.WriteLine("<INVBUY>");
+                writer.WriteLine("<REINVEST>");
                 writer.WriteLine("<INVTRAN>");
                 writer.WriteLine($"<FITID>{value[1]}</FITID>");
 
@@ -182,38 +189,74 @@ public class ExportOFX : MonoBehaviour
                 writer.WriteLine("</INVTRAN>");
 
                 writer.WriteLine("<SECID>");
-                writer.WriteLine("<UNIQUEID>037833100</UNIQUEID>");
+                writer.WriteLine($"<UNIQUEID>{value[4]}001</UNIQUEID>");
                 writer.WriteLine("<UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>");
                 writer.WriteLine("</SECID>");
 
-                writer.WriteLine($"<UNITS>{value[3]}</UNITS>");
-                writer.WriteLine($"<UNITPRICE>{value[5]}</UNITPRICE>");
-                writer.WriteLine($"<COMMISSION>{value[6]}</COMMISSION>");
+
+                writer.WriteLine("<INCOMETYPE>DIV</INCOMETYPE>");
+               // writer.WriteLine($"<COMMISSION>{value[6]}</COMMISSION>");
                 writer.WriteLine($"<TOTAL>{value[7]}</TOTAL>");
                 writer.WriteLine("<SUBACCTSEC>CASH</SUBACCTSEC>");
-                writer.WriteLine("<SUBACCTFUND>CASH</SUBACCTFUND>");
-                writer.WriteLine("</INVBUY>");
-                writer.WriteLine("<BUYTYPE>BUY</BUYTYPE>");
-                writer.WriteLine("</BUYSTOCK>");
+                //writer.WriteLine("<SUBACCTFUND>CASH</SUBACCTFUND>");
+                //writer.WriteLine("<BUYTYPE>BUY</BUYTYPE>");
+                writer.WriteLine($"<UNITS>{value[3]}</UNITS>");
+                writer.WriteLine($"<UNITPRICE>{value[5]}</UNITPRICE>");
+
+                writer.WriteLine("</REINVEST>");
                 #endregion
-                print("WRITE COMPLETED: " + (i+1));
-                i++;
+                
+                StockOrderCount += 1;
+                print("STOCK BUY COMPLETED: " + StockOrderCount);
             }
         }
 
 
         #endregion
-        writer.WriteLine("<INVSTMTRS>");
+        writer.WriteLine("</INVTRANLIST>");
+        writer.WriteLine("</INVSTMTRS>");
         #endregion
 
         writer.WriteLine("</INVSTMTTRNRS>");
         writer.WriteLine("</INVSTMTMSGRSV1>");
         #endregion
 
+        #region WRITE STOCK INFO
+        writer.WriteLine("<SECLISTMSGSRSV1>");
+        writer.WriteLine("<SECLIST>");
+        foreach (var stocks in stockPrices.Values)
+        {
+            //print(stocks[4]);
+            writer.WriteLine("<STOCKINFO>");
+            writer.WriteLine("<SECINFO>");
+            writer.WriteLine("<SECID>");
+            writer.WriteLine($"<UNIQUEID>{stocks[4]}001</UNIQUEID>");
+            writer.WriteLine("<UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>");
+            writer.WriteLine("</SECID>");
+            writer.WriteLine($"<SECNAME>{stocks[4]}</SECNAME>");
+            writer.WriteLine($"<TICKER>{stocks[4]}</TICKER>");
+            writer.WriteLine($"<UNITPRICE>{stocks[0]}</UNITPRICE>");
+            writer.WriteLine($"<DTASOF>{stocks[1]}{stocks[2]}{stocks[3]}120000</DTASOF>");
+            writer.WriteLine("</SECINFO>");
+            writer.WriteLine("</STOCKINFO>");
+            
+            StockCount += 1;
+            print("STOCK INFO COMPLETED: " + StockCount);
+        }
+
+
+
+
+        writer.WriteLine("</SECLIST>");
+        writer.WriteLine("</SECLISTMSGSRSV1>");
+        #endregion
         writer.WriteLine("</OFX>");
         writer.Close();
-
+        
         #endregion
+
+        string inputText = _inputDisplay.text;
+        _inputDisplay.text = $"Stock Buys: {StockOrderCount} \nUnique Stocks: {StockCount} \n\n\n" + inputText;
 
 
         Debug.Log("END");
@@ -224,6 +267,7 @@ public class ExportOFX : MonoBehaviour
         //Update vars based on text field input
         _brokerID = _brokerText.text;
         _accID = _accText.text;
+        //print(_brokerID + "  " +  _accID);
     }
 
     string ParseDate(string dateInput)
@@ -231,7 +275,7 @@ public class ExportOFX : MonoBehaviour
         string newDate = "";
         if (dateInput != "***END OF FILE***")
         {
-            print(dateInput);
+          //  print(dateInput);
             
             //Format date into date+hour
             string[] dateChars = dateInput.Split('/');

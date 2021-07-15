@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 public class RegexFormat : MonoBehaviour
 {
     public Dictionary<int, List<string>> _data = new Dictionary<int, List<string>>();
+    public Dictionary<string, List<string>> _stockPrices = new Dictionary<string, List<string>>();
     [SerializeField]
     TMP_Text _inputDisplay;
     [SerializeField]
@@ -148,6 +149,7 @@ public class RegexFormat : MonoBehaviour
                 
                 if (isRemovingWhole == false)
                 {
+                    CreateStockDictionary(new object[] {symbol, price, date });
                     AddDataEntry(new object[] { entry, date, tranID, desc, quantity, symbol, price, commission, amount, regFee, shortRDM, fundRedemption, deferredFee });
                     //print("notON");
                     
@@ -157,7 +159,7 @@ public class RegexFormat : MonoBehaviour
                     bool success = int.TryParse(quantity,out int testFloat);
                         if (!success)
                         {
-                        
+                        CreateStockDictionary(new object[] { symbol, price, date });
                         AddDataEntry(new object[] { entry, date, tranID, desc, quantity, symbol, price, commission, amount, regFee, shortRDM, fundRedemption, deferredFee });
                         //print("fail even" + entry + "  " + quantity);
                         
@@ -179,7 +181,7 @@ public class RegexFormat : MonoBehaviour
        
         //Pass data to next script
         ExportOFX _nextScript = _controller.GetComponent<ExportOFX>();
-        _nextScript.ConvertToOFX(_data);
+        _nextScript.ConvertToOFX(_data, _stockPrices);
         
     }
 
@@ -222,5 +224,88 @@ public class RegexFormat : MonoBehaviour
     public void UpdateCheckBox()
     {
         isRemovingWhole = _toggleWhole.isOn;
+    }
+
+
+    void CreateStockDictionary(params object[] entry)
+    {
+        string symbol = (string)entry[0];
+        string price = (string)entry[1];
+        string dateString = (string)entry[2];
+        string[] dateChars;
+        string year = "";
+        string month = "";
+        string day = "";
+        if (dateString != "***END OF FILE***")
+        {
+            dateChars = dateString.Split('/');
+            year = dateChars[2];
+            month = dateChars[0];
+            day = dateChars[1];
+
+            //foreach (string datechar in dateChars)
+            //{
+            //    date += datechar;
+            //}
+
+            if (_stockPrices.ContainsKey(symbol)) //contains key already
+            {
+                if (int.Parse(year) >= int.Parse(_stockPrices[symbol][1])) //year is equal or greater then previous entry
+                {
+                    if (int.Parse(month) >= int.Parse(_stockPrices[symbol][2])) //month is equal or greater then previous entry
+                    {
+                        if (int.Parse(day) >= int.Parse(_stockPrices[symbol][0])) //year is equal or greater then previous entry
+                        {
+                            //Debug.Log(month + "  " + day + "  /  " + _stockPrices[symbol][0]);
+                            List<string> entryList = new List<string>();
+                            entryList.Insert(0, price); //0
+                            entryList.Insert(1, year); //0
+                            entryList.Insert(2, month); //0
+                            entryList.Insert(3, day); //0
+                            entryList.Insert(4, symbol); //0
+                                                         //Create dictionary
+                            _stockPrices.Add(symbol, entryList);
+
+                        }
+                        else //day is lower then previous entry
+                        {
+                            //Debug.Log(month + "  " + day + "  /  " + _stockPrices[symbol][0]);
+                        }
+                    }
+                    else //month is lower then previous entry
+                    {
+                        //Debug.Log(month + "  " + day + "  /  " + _stockPrices[symbol][0]);
+                    }
+                }
+                else //year is lower then previous entry
+                {
+                    //print(year);
+                }
+            }
+            else //create entry
+            {
+                //print("create entry");
+                List<string> entryList = new List<string>();
+                entryList.Insert(0, price); //0
+                entryList.Insert(1, year); //0
+                entryList.Insert(2, month); //0
+                entryList.Insert(3, day); //0
+                entryList.Insert(4, symbol); //0
+                //Create dictionary
+                _stockPrices.Add(symbol, entryList);
+            }
+        }
+
+
+        
+
+
+
+
+    }
+
+    void iniDictionaryStockPrices()
+    {
+
     }
 }
