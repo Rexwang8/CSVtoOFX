@@ -16,12 +16,11 @@ public class RegexFormat : MonoBehaviour
     GameObject _controller;
     [SerializeField]
     TMP_Text _statusDisplay;
-    [SerializeField]
-    Toggle _toggleWhole;
 
-    bool isRemovingWhole = false;
     int entry = 0;
     private int _length;
+
+
 
     public void FormatCSVtoQFX(string input)
     {
@@ -147,11 +146,10 @@ public class RegexFormat : MonoBehaviour
             if (lineCount != _length-1 && lineCount != 0)
             {
                 
-                if (isRemovingWhole == false)
+                if (StaticData.isRemovingWhole == false)
                 {
                     CreateStockDictionary(new object[] {symbol, price, date });
                     AddDataEntry(new object[] { entry, date, tranID, desc, quantity, symbol, price, commission, amount, regFee, shortRDM, fundRedemption, deferredFee });
-                    //print("notON");
                     
                 }
                 else
@@ -161,12 +159,10 @@ public class RegexFormat : MonoBehaviour
                         {
                         CreateStockDictionary(new object[] { symbol, price, date });
                         AddDataEntry(new object[] { entry, date, tranID, desc, quantity, symbol, price, commission, amount, regFee, shortRDM, fundRedemption, deferredFee });
-                        //print("fail even" + entry + "  " + quantity);
                         
                     }
                         else
-                    {
-                        //print("pass even" + entry + "  " + quantity);
+                    { 
                     }
 
                 }
@@ -221,10 +217,7 @@ public class RegexFormat : MonoBehaviour
         _data.Add(key, entryList);
     }
 
-    public void UpdateCheckBox()
-    {
-        isRemovingWhole = _toggleWhole.isOn;
-    }
+    
 
 
     void CreateStockDictionary(params object[] entry)
@@ -269,22 +262,18 @@ public class RegexFormat : MonoBehaviour
                         }
                         else //day is lower then previous entry
                         {
-                            //Debug.Log(month + "  " + day + "  /  " + _stockPrices[symbol][0]);
                         }
                     }
                     else //month is lower then previous entry
                     {
-                        //Debug.Log(month + "  " + day + "  /  " + _stockPrices[symbol][0]);
                     }
                 }
                 else //year is lower then previous entry
                 {
-                    //print(year);
                 }
             }
             else //create entry
             {
-                //print("create entry");
                 List<string> entryList = new List<string>();
                 entryList.Insert(0, price); //0
                 entryList.Insert(1, year); //0
@@ -301,11 +290,6 @@ public class RegexFormat : MonoBehaviour
 
 
 
-
-    }
-
-    void iniDictionaryStockPrices()
-    {
 
     }
 }

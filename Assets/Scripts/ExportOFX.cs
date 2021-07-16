@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 using System.IO;
+using UnityEngine.UI;
 using TMPro;
 
 public class ExportOFX : MonoBehaviour
 {
     [SerializeField]
     GameObject _controller;
-    [SerializeField]
-    string _outputName = "OutputOFX";
     string date = "";
-
-    private string _brokerID;
-    private string _accID;
 
     [SerializeField]
     TMP_Text _brokerText;
     [SerializeField]
     TMP_Text _accText;
+    [SerializeField]
+    TMP_InputField _accField;
+
+    [SerializeField]
+    TMP_Text _fileOutputName;
 
     [SerializeField]
     TMP_Text _inputDisplay;
+
+
     int StockCount = 0;
     int StockOrderCount = 0;
 
@@ -45,7 +48,7 @@ public class ExportOFX : MonoBehaviour
         string newPath = "";
 
         //Put new path in same folder as original path
-        orPathArr[orPathArr.Length - 1] = $"{_outputName}.ofx";
+
         int i = 0;
         foreach (var word in orPathArr)
         {
@@ -53,21 +56,38 @@ public class ExportOFX : MonoBehaviour
             {
                 newPath += orPathArr[i] + "/";
             }
-            else
+            else //end of the file path
             {
+                if (StaticData.isUsingFileName)
+                {
+                    string[] _newFileArr = orPathArr[i].Split('.');
+                    StaticData.CurrentAccountID = _newFileArr[0];
+                    print("UsingACCID: " + StaticData.CurrentAccountID);
+                }
+                orPathArr[orPathArr.Length - 1] = $"{StaticData.OutputName}.ofx";
                 newPath += orPathArr[i];
             }
-            
+
 
             i++;
         }
+        ////For if no file name is set
+        //if (newPath == "")
+        //{
+        //    newPath = 
+        //}
 
         //Overwrite file if exists already
-        if(File.Exists(newPath))
+        if (File.Exists(newPath))
         {
             File.Delete(newPath);
         }
         print("Output Location: " + newPath);
+
+
+
+
+
         #region Write File
         //Write some text to the test.txt file
         StreamWriter writer = new StreamWriter(newPath, true);
@@ -123,7 +143,7 @@ public class ExportOFX : MonoBehaviour
         #endregion
 
         #region WRITE INVESTMENT
-        writer.WriteLine("<INVSTMTMSGRSV1>");
+        writer.WriteLine("<INVSTMTMSGSRSV1>");
         writer.WriteLine("<INVSTMTTRNRS>");
 
         #region WRITE SUCCESS
@@ -135,7 +155,7 @@ public class ExportOFX : MonoBehaviour
         #endregion
 
         #region WRITE STOCK BUY
-        
+
         writer.WriteLine("<INVSTMTRS>");
         #region ACC INFO
         //HEADER
@@ -143,8 +163,8 @@ public class ExportOFX : MonoBehaviour
         writer.WriteLine("<CURDEF>USD</CURDEF>");
         //BROKER ID AND ACC ID
         writer.WriteLine("<INVACCTFROM>");
-        writer.WriteLine($"<BROKERID>{_brokerID}</BROKERID>");
-        writer.WriteLine($"<ACCTID>{_accID}</ACCTID>");
+        writer.WriteLine($"<BROKERID>{StaticData.CurrentBrokerID}</BROKERID>");
+        writer.WriteLine($"<ACCTID>{StaticData.CurrentAccountID}</ACCTID>");
         writer.WriteLine("</INVACCTFROM>");
         writer.WriteLine("<INVTRANLIST>");
 
@@ -155,13 +175,11 @@ public class ExportOFX : MonoBehaviour
         string startDate = "";
         foreach (var value in input.Values)
         {
-            if (i == 0)
-            {
-                startDate = ParseDate(value[0]);
-            }
+            startDate = ParseDate(value[0]);
             i++;
         }
-        writer.WriteLine($"<DTSTART>{startDate}</DTSTART>");
+
+        writer.WriteLine($"<DTSTART>{startDate}120000</DTSTART>");
         writer.WriteLine($"<DTEND>{date}120000</DTEND>");
         foreach (var value in input.Values)
         {
@@ -175,15 +193,15 @@ public class ExportOFX : MonoBehaviour
                 string dateNoTime;
                 if (value[0] != "***END OF FILE***")
                 {
-                    dateNoTime = ParseDateNoTime(value[0]);
+                    dateNoTime = ParseDate(value[0]);
                 }
                 else
                 {
                     dateNoTime = "20210101";
                 }
 
-                writer.WriteLine($"<DTTRADE>{dateNoTime}</DTTRADE>");
-                writer.WriteLine($"<DTSETTLE>{dateNoTime}</DTSETTLE>");
+                writer.WriteLine($"<DTTRADE>{dateNoTime}120000</DTTRADE>");
+                writer.WriteLine($"<DTSETTLE>{dateNoTime}120000</DTSETTLE>");
 
                 writer.WriteLine($"<MEMO>{value[2]}</MEMO>");
                 writer.WriteLine("</INVTRAN>");
@@ -195,7 +213,7 @@ public class ExportOFX : MonoBehaviour
 
 
                 writer.WriteLine("<INCOMETYPE>DIV</INCOMETYPE>");
-               // writer.WriteLine($"<COMMISSION>{value[6]}</COMMISSION>");
+                // writer.WriteLine($"<COMMISSION>{value[6]}</COMMISSION>");
                 writer.WriteLine($"<TOTAL>{value[7]}</TOTAL>");
                 writer.WriteLine("<SUBACCTSEC>CASH</SUBACCTSEC>");
                 //writer.WriteLine("<SUBACCTFUND>CASH</SUBACCTFUND>");
@@ -205,7 +223,7 @@ public class ExportOFX : MonoBehaviour
 
                 writer.WriteLine("</REINVEST>");
                 #endregion
-                
+
                 StockOrderCount += 1;
                 print("STOCK BUY COMPLETED: " + StockOrderCount);
             }
@@ -218,7 +236,7 @@ public class ExportOFX : MonoBehaviour
         #endregion
 
         writer.WriteLine("</INVSTMTTRNRS>");
-        writer.WriteLine("</INVSTMTMSGRSV1>");
+        writer.WriteLine("</INVSTMTMSGSRSV1>");
         #endregion
 
         #region WRITE STOCK INFO
@@ -226,7 +244,6 @@ public class ExportOFX : MonoBehaviour
         writer.WriteLine("<SECLIST>");
         foreach (var stocks in stockPrices.Values)
         {
-            //print(stocks[4]);
             writer.WriteLine("<STOCKINFO>");
             writer.WriteLine("<SECINFO>");
             writer.WriteLine("<SECID>");
@@ -239,7 +256,7 @@ public class ExportOFX : MonoBehaviour
             writer.WriteLine($"<DTASOF>{stocks[1]}{stocks[2]}{stocks[3]}120000</DTASOF>");
             writer.WriteLine("</SECINFO>");
             writer.WriteLine("</STOCKINFO>");
-            
+
             StockCount += 1;
             print("STOCK INFO COMPLETED: " + StockCount);
         }
@@ -252,7 +269,7 @@ public class ExportOFX : MonoBehaviour
         #endregion
         writer.WriteLine("</OFX>");
         writer.Close();
-        
+
         #endregion
 
         string inputText = _inputDisplay.text;
@@ -262,21 +279,13 @@ public class ExportOFX : MonoBehaviour
         Debug.Log("END");
     }
 
-    public void UpdateInfo()
-    {
-        //Update vars based on text field input
-        _brokerID = _brokerText.text;
-        _accID = _accText.text;
-        //print(_brokerID + "  " +  _accID);
-    }
 
     string ParseDate(string dateInput)
     {
         string newDate = "";
         if (dateInput != "***END OF FILE***")
         {
-          //  print(dateInput);
-            
+
             //Format date into date+hour
             string[] dateChars = dateInput.Split('/');
             if (dateChars[2] == null || dateChars[1] == null || dateChars[0] == null)
@@ -285,30 +294,12 @@ public class ExportOFX : MonoBehaviour
             }
             else
             {
-                newDate = $"{dateChars[2]}{dateChars[1]}{dateChars[0]}120000";
+                newDate = $"{dateChars[2]}{dateChars[0]}{dateChars[1]}";
             }
-            
+
             //string newDate = $"{dateChars[2]}{dateChars[1]}{dateChars[0]}120000";
         }
 
-        return newDate;
-    }
-    string ParseDateNoTime(string dateInput)
-    {
-        //Format Date
-        string[] dateChars = dateInput.Split('/');
-        string newDate;
-        if (dateChars[2] == null || dateChars[1] == null || dateChars[0] == null)
-        {
-            newDate = "20210101";
-        }
-        else
-        {
-            newDate = $"{dateChars[2]}{dateChars[1]}{dateChars[0]}";
-        }
-
-        
-        
         return newDate;
     }
 }

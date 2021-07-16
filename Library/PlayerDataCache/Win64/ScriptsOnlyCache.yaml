@@ -2,6 +2,7 @@ ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
     - ExportOFX
+    - InputHandler
     - OpenFile
     - RegexFormat
     SimpleFileBrowser.Runtime.dll:
@@ -33,6 +34,7 @@ ScriptsOnlyBuild:
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.UnitTesting.CallbackData
     Unity.TextMeshPro.dll:
+    - TMPro.TMP_Dropdown
     - TMPro.TMP_FontAsset
     - TMPro.TMP_InputField
     - TMPro.TMP_Settings
@@ -113,6 +115,8 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 2806}
     - Class: 114
+      Script: {instanceID: 2820}
+    - Class: 114
       Script: {instanceID: 2852}
     - Class: 114
       Script: {instanceID: 2926}
@@ -162,6 +166,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 5096}
     - Class: 114
       Script: {instanceID: 5662}
+    - Class: 114
+      Script: {instanceID: 36984}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -247,7 +253,7 @@ ScriptsOnlyBuild:
     className: Slider
   - hash:
       serializedVersion: 2
-      Hash: 241efefe500097c327f62517d66083f7
+      Hash: 32026d7cb253a2eef942e6d4c48ad80a
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: RegexFormat
@@ -265,7 +271,7 @@ ScriptsOnlyBuild:
     className: Shadow
   - hash:
       serializedVersion: 2
-      Hash: 71b3d75698e5286548159202cf5aca52
+      Hash: be45733ce6e479ba8c7cfb6ce6f5d98b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ExportOFX
@@ -283,7 +289,7 @@ ScriptsOnlyBuild:
     className: GroupTrack
   - hash:
       serializedVersion: 2
-      Hash: 866aa5b5f61455f243a04ed8dcd03d8e
+      Hash: 3a15b8b4ad129c1535222c1dffec4c38
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: OpenFile
@@ -785,6 +791,12 @@ ScriptsOnlyBuild:
     assemblyName: SimpleFileBrowser.Runtime.dll
     namespaceName: SimpleFileBrowser
     className: FileBrowserMovement
+  - hash:
+      serializedVersion: 2
+      Hash: 0288300bec4d0da6f2d7d33bff4dde31
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: InputHandler
   platform: 19
   scenePathNames:
   - Assets/Scenes/Main.unity
