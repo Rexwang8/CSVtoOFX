@@ -11,5 +11,6 @@ public static class StaticData
     public static bool isRemovingWhole;
     public static bool isUsingFileName;
     public static bool isUsingProfiles;
+    public static bool isWritingFileNameAsACCID;
     public static string OutputName = "OutputOFX";
 }

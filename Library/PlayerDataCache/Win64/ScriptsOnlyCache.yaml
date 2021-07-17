@@ -125,49 +125,49 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 3080}
     - Class: 114
-      Script: {instanceID: 3266}
+      Script: {instanceID: 3144}
     - Class: 114
-      Script: {instanceID: 3276}
+      Script: {instanceID: 3268}
     - Class: 114
-      Script: {instanceID: 3378}
+      Script: {instanceID: 3278}
     - Class: 114
-      Script: {instanceID: 3480}
+      Script: {instanceID: 3380}
     - Class: 114
-      Script: {instanceID: 3604}
+      Script: {instanceID: 3482}
     - Class: 114
-      Script: {instanceID: 3764}
+      Script: {instanceID: 3606}
     - Class: 114
-      Script: {instanceID: 3826}
+      Script: {instanceID: 3766}
     - Class: 114
-      Script: {instanceID: 3844}
+      Script: {instanceID: 3828}
     - Class: 114
-      Script: {instanceID: 4104}
+      Script: {instanceID: 3846}
     - Class: 114
-      Script: {instanceID: 4166}
+      Script: {instanceID: 4106}
     - Class: 114
-      Script: {instanceID: 4244}
+      Script: {instanceID: 4168}
     - Class: 114
-      Script: {instanceID: 4356}
+      Script: {instanceID: 4246}
     - Class: 114
-      Script: {instanceID: 4358}
+      Script: {instanceID: 4360}
     - Class: 114
-      Script: {instanceID: 4380}
+      Script: {instanceID: 4362}
     - Class: 114
-      Script: {instanceID: 4522}
+      Script: {instanceID: 4384}
     - Class: 114
-      Script: {instanceID: 4580}
+      Script: {instanceID: 4526}
     - Class: 114
-      Script: {instanceID: 4686}
+      Script: {instanceID: 4584}
     - Class: 114
-      Script: {instanceID: 4712}
+      Script: {instanceID: 4690}
     - Class: 114
-      Script: {instanceID: 4918}
+      Script: {instanceID: 4716}
     - Class: 114
-      Script: {instanceID: 5096}
+      Script: {instanceID: 4922}
     - Class: 114
-      Script: {instanceID: 5662}
+      Script: {instanceID: 5100}
     - Class: 114
-      Script: {instanceID: 36984}
+      Script: {instanceID: 5666}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -431,6 +431,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.TestRunner.dll
     namespaceName: UnityEngine.TestTools.TestRunner.Callbacks
     className: TestResultRendererCallback
+  - hash:
+      serializedVersion: 2
+      Hash: 98fa104d73743650042b734b270b7ab5
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: InputHandler
   - hash:
       serializedVersion: 2
       Hash: 748dd2a2a28da4e618912da5ac45684b
@@ -791,12 +797,6 @@ ScriptsOnlyBuild:
     assemblyName: SimpleFileBrowser.Runtime.dll
     namespaceName: SimpleFileBrowser
     className: FileBrowserMovement
-  - hash:
-      serializedVersion: 2
-      Hash: 0288300bec4d0da6f2d7d33bff4dde31
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: InputHandler
   platform: 19
   scenePathNames:
   - Assets/Scenes/Main.unity

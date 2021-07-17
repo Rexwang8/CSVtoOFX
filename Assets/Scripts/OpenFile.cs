@@ -84,7 +84,11 @@ public class OpenFile : MonoBehaviour
     void PopulateDropDown()
     {
         //Import profile.txt
-        string profileAsset = _profileAccID.ToString();
+        byte[] m_bytes = File.ReadAllBytes(Application.streamingAssetsPath + "\\Profile.txt");
+        print(Application.streamingAssetsPath + "Profile.txt");
+        string profileAsset = System.Text.Encoding.UTF8.GetString(m_bytes);
+       
+       // string profileAsset = _profileAccID.ToString();
         string[] separatingStrings = { "||", "DEFERRED SALES CHARGE" };
         string[] profileLines = profileAsset.Split(separatingStrings, 0);
 
@@ -152,6 +156,7 @@ public class OpenFile : MonoBehaviour
         StaticData.isRemovingWhole = false;
         StaticData.isUsingFileName = false;
         StaticData.isUsingProfiles = false;
+        StaticData.isWritingFileNameAsACCID = false;
     }
     void AddDataEntryAndDropdown(params object[] entry)
     {

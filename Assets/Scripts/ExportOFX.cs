@@ -64,7 +64,17 @@ public class ExportOFX : MonoBehaviour
                     StaticData.CurrentAccountID = _newFileArr[0];
                     print("UsingACCID: " + StaticData.CurrentAccountID);
                 }
-                orPathArr[orPathArr.Length - 1] = $"{StaticData.OutputName}.ofx";
+                //FILE NAME TOGGLE
+                if (StaticData.isWritingFileNameAsACCID)
+                {
+                    orPathArr[orPathArr.Length - 1] = $"{StaticData.CurrentAccountID}.ofx";
+
+                }
+                else
+                {
+                    orPathArr[orPathArr.Length - 1] = $"{StaticData.OutputName}.ofx";
+                }
+                
                 newPath += orPathArr[i];
             }
 
@@ -90,7 +100,7 @@ public class ExportOFX : MonoBehaviour
 
         #region Write File
         //Write some text to the test.txt file
-        StreamWriter writer = new StreamWriter(newPath, true);
+        StreamWriter writer = new StreamWriter(newPath, true, Encoding.ASCII);
         //WRITE HEADER
         writer.WriteLine("<?xml version=\"1.0\" encoding=\"US - ASCII\"?>");
         writer.WriteLine("<?OFX OFXHEADER=\"200\" VERSION=\"200\" SECURITY=\"NONE\" OLDFILEUID=\"NONE\" NEWFILEUID=\"NONE\"?>");
@@ -163,7 +173,22 @@ public class ExportOFX : MonoBehaviour
         writer.WriteLine("<CURDEF>USD</CURDEF>");
         //BROKER ID AND ACC ID
         writer.WriteLine("<INVACCTFROM>");
-        writer.WriteLine($"<BROKERID>{StaticData.CurrentBrokerID}</BROKERID>");
+      
+
+        // Convert the string into a byte array.
+        byte[] unicodeBytes = Encoding.Unicode.GetBytes(StaticData.CurrentBrokerID);
+
+        // Perform the conversion from one encoding to the other.
+        byte[] asciiBytes = Encoding.Convert(Encoding.Unicode, Encoding.ASCII, unicodeBytes);
+
+        // Convert the new byte[] into a char[] and then into a string.
+        char[] asciiChars = new char[Encoding.ASCII.GetCharCount(asciiBytes, 0, asciiBytes.Length)];
+        Encoding.ASCII.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0);
+        string asciiString = new string(asciiChars);
+        string tempBroker = asciiString;
+
+
+        writer.WriteLine($"<BROKERID>{tempBroker}</BROKERID>");
         writer.WriteLine($"<ACCTID>{StaticData.CurrentAccountID}</ACCTID>");
         writer.WriteLine("</INVACCTFROM>");
         writer.WriteLine("<INVTRANLIST>");
