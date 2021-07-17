@@ -43,7 +43,7 @@ public class ExportOFX : MonoBehaviour
         //Find original path
         OpenFile openScript = _controller.GetComponent<OpenFile>();
         string path = openScript.Path;
-        print("ORIGINAL PATH:  " + path);
+        //print("ORIGINAL PATH:  " + path);
         string[] orPathArr = path.Split('\\');
         string newPath = "";
 
@@ -69,6 +69,11 @@ public class ExportOFX : MonoBehaviour
                 {
                     orPathArr[orPathArr.Length - 1] = $"{StaticData.CurrentAccountID}.ofx";
 
+                }
+                else if (StaticData.isWritingFileNameAsProfileID)
+                {
+                    orPathArr[orPathArr.Length - 1] = $"{StaticData.dropDownSelectionName}.ofx";
+                    print("USING PROFILE NAME");
                 }
                 else
                 {

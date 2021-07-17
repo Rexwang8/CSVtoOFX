@@ -12,5 +12,8 @@ public static class StaticData
     public static bool isUsingFileName;
     public static bool isUsingProfiles;
     public static bool isWritingFileNameAsACCID;
+    public static bool isWritingFileNameAsProfileID;
     public static string OutputName = "OutputOFX";
+
+    public static string dropDownSelectionName;
 }

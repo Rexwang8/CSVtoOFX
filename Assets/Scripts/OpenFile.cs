@@ -8,6 +8,7 @@ using TMPro;
 
 public class OpenFile : MonoBehaviour
 {
+    [HideInInspector]
     public string Path;
 
     [SerializeField]
@@ -22,14 +23,17 @@ public class OpenFile : MonoBehaviour
     [SerializeField]
     TMP_Dropdown _accIDDropdown;
 
+    //[SerializeField]
+    //TextAsset _profileAccID;
+
     [SerializeField]
-    TextAsset _profileAccID;
+    Button _buttonStart;
 
     [SerializeField]
     private string _defaultOutputName;
 
     private int optionsCount = 0;
-
+    private int _chosenInt = 0;
 
 
     public Dictionary<int, List<string>> _profiles = new Dictionary<int, List<string>>();
@@ -85,7 +89,7 @@ public class OpenFile : MonoBehaviour
     {
         //Import profile.txt
         byte[] m_bytes = File.ReadAllBytes(Application.streamingAssetsPath + "\\Profile.txt");
-        print(Application.streamingAssetsPath + "Profile.txt");
+        //print(Application.streamingAssetsPath + "Profile.txt");
         string profileAsset = System.Text.Encoding.UTF8.GetString(m_bytes);
        
        // string profileAsset = _profileAccID.ToString();
@@ -153,10 +157,14 @@ public class OpenFile : MonoBehaviour
     private void Awake()
     {
         StaticData.OutputName = _defaultOutputName;
-        StaticData.isRemovingWhole = false;
+        StaticData.isRemovingWhole = true;
         StaticData.isUsingFileName = false;
         StaticData.isUsingProfiles = false;
         StaticData.isWritingFileNameAsACCID = false;
+        StaticData.isWritingFileNameAsProfileID = false;
+        StaticData.CurrentBrokerID = "DefaultBroker";
+        StaticData.CurrentAccountID = "123456789";
+        StaticData.dropDownSelectionName = "DefaultProfileName";
     }
     void AddDataEntryAndDropdown(params object[] entry)
     {
@@ -176,13 +184,20 @@ public class OpenFile : MonoBehaviour
 
     public void OnDropdownChanged()
     {
+
         //Find Integer the dropdown is using
-        int chosenInt = optionsCount+1 - _accIDDropdown.value;
+        _chosenInt = optionsCount+1 - _accIDDropdown.value;
         //If it isn't the starting int and dropdown is enabled, set account ID to it.
-        if (chosenInt != optionsCount + 1 && StaticData.isUsingProfiles)
+        if (_chosenInt != optionsCount + 1 && StaticData.isUsingProfiles)
         {
-            StaticData.CurrentAccountID = _profiles[chosenInt][1];
+            StaticData.CurrentAccountID = _profiles[_chosenInt][1];
+            StaticData.dropDownSelectionName = _profiles[_chosenInt][0];
             print("USING PROFILE ID:  " + StaticData.CurrentAccountID);
+            _buttonStart.interactable = true;
+        }
+        else
+        {
+            
         }
         
     }

@@ -16,6 +16,8 @@ public class InputHandler : MonoBehaviour
     Toggle _toggleUsingProfiles;
     [SerializeField]
     Toggle _toggleisWritingFileNameAsACCID;
+    [SerializeField]
+    Toggle _toggleisWritingFileNameAsProfileID;
 
 
     [SerializeField]
@@ -31,6 +33,9 @@ public class InputHandler : MonoBehaviour
     [SerializeField]
     TMP_Dropdown _profileDropdown;
 
+    [SerializeField]
+    Button _buttonStart;
+
 
     public void UpdateCheckBox()
     {
@@ -38,6 +43,7 @@ public class InputHandler : MonoBehaviour
         StaticData.isUsingFileName = _toggleUseFileName.isOn;
         StaticData.isUsingProfiles = _toggleUsingProfiles.isOn;
         StaticData.isWritingFileNameAsACCID = _toggleisWritingFileNameAsACCID.isOn;
+        StaticData.isWritingFileNameAsProfileID = _toggleisWritingFileNameAsProfileID.isOn;
 
         if (StaticData.isUsingFileName)
         {
@@ -51,6 +57,7 @@ public class InputHandler : MonoBehaviour
             _profileDropdown.interactable = true;
             _toggleUseFileName.interactable = false;
             _accField.interactable = false;
+            _buttonStart.interactable = false;
         }
         else 
         {
@@ -63,10 +70,19 @@ public class InputHandler : MonoBehaviour
         if (StaticData.isWritingFileNameAsACCID)
         {
             _fileField.interactable = false;
+            _toggleisWritingFileNameAsProfileID.interactable = false;
+
+        }
+        else if (StaticData.isWritingFileNameAsProfileID)
+        {
+            _fileField.interactable = false;
+            _toggleisWritingFileNameAsACCID.interactable = false;
         }
         else
         {
             _fileField.interactable = true;
+            _toggleisWritingFileNameAsProfileID.interactable = true;
+            _toggleisWritingFileNameAsACCID.interactable = true;
         }
 
 
